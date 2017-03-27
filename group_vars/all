@@ -1,0 +1,25 @@
+user:
+    name: brendan
+    uid: 1000
+    shell: /usr/bin/bash
+    password: pw
+
+packages:
+    default:
+        - python
+        - bash
+        - bash-completion
+        - zsh
+        - zsh-completions
+        - sudo 
+    user:
+        - grub
+        - os-prober
+        - openssh
+        - xorg-xinit
+        - xorg-twm 
+        - xterm
+        - alsa-utils
+
+
+hostname: arch

@@ -1,0 +1,39 @@
+---
+- name: Copy pacman configuration file
+  copy: src=pacman.conf dest=/etc/pacman.conf
+  tags:
+    - sys-admin
+
+- name: Adding Username
+  command: arch-chroot /mnt useradd -m -g users -G adm,lp,wheel,power,audio,video -s /bin/bash -p pw brendan 
+  tags:
+    - sys-admin
+
+- name: Set user password
+  user: name=brendan password=pw
+  tags:
+    - sys-admin
+
+- name: Update sudoers file
+  copy:
+    src: sudoers
+    dest: /etc/sudoers
+    validate: 'visudo -cf %s'
+  tags:
+    - sys-admin
+
+- name: Set the hostname
+  hostname: name={{ hostname }}
+  when: hostname is defined
+  tags:
+    - sys-admin
+
+- name: Copy hostname file
+  copy: src=hosts dest=/etc/hosts
+  tags:
+    - sys-admin
+
+- name: dhcpcd
+  command: arch-chroot /mnt systemctl enable dhcpcd
+  tags:
+    - sys-admin

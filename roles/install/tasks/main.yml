@@ -1,0 +1,65 @@
+---
+- name: Test Internet Connection
+  command: ping -c 3 archlinux.org
+  tags: 
+    - install
+
+- name: Update the system clock
+  command: timedatectl set-ntp true
+  tags: 
+    - install
+
+- name: Partition the disks
+  parted: device=/dev/sda number=1 part_type=primary part_start=0% part_end=100% state=present unit=MiB flags=boot
+  tags: 
+    - install
+
+- name: Format the partitions
+  command: mkfs.ext4 /dev/sda1
+  tags: 
+    - install
+
+  # @TODO use mount module
+- name: Mount the file system
+  command: mount /dev/sda1 /mnt
+  tags: 
+    - install
+
+- name: Select the mirrors
+  copy: src=mirrorlist dest=/etc/pacman.d/mirrorlist
+  become: yes
+  tags: 
+    - install
+
+- name: Install the base packages
+  command: pacstrap /mnt base base-devel
+  become: yes
+  tags: 
+    - install
+
+- name: Fstab
+  command: genfstab -U /mnt >> /mnt/etc/fstab
+  tags: 
+    - install
+  become: yes
+
+- name: Set the time zone
+  command: arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
+  tags: 
+    - install
+
+- name: Run hwclock
+  command:  arch-chroot /mnt hwclock --systohc
+  tags: 
+    - install
+
+- name: Locale
+  command: arch-chroot /mnt locale-gen
+  tags: 
+    - install
+
+- name: Set the LANG
+  copy: src=locale.conf dest=/etc/locale.conf
+  tags: 
+    - install
+

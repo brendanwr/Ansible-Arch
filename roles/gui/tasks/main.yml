@@ -1,0 +1,40 @@
+---
+- name: Update and Upgrade 
+  pacman: update_cache=yes 
+  become: yes
+  tags:
+    - gui
+
+- name: mkinitcpio 
+  command: arch-chroot /mnt mkinitcpio -p linux
+  tags:
+    - gui
+
+- name: Install User Packages
+  command: arch-chroot /mnt pacman -S {{ item }} --noconfirm
+  with_items: "{{ packages.user }}"
+  tags:
+    - gui
+
+- name: Enable SSH service
+  command: arch-chroot /mnt systemctl enable sshd.service
+
+- name: grub-install
+  command: arch-chroot /mnt grub-install  --target=i386-pc /dev/sda
+  tags:
+    - gui
+
+- name: grub-mkconfig
+  command: arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+  tags:
+    - gui
+
+- name: fstab
+  command: genfstab /mnt >> /mnt/etc/fstab
+  tags:
+    - gui
+
+- name: unmount
+  command: umount /mnt -R
+  tags:
+    - gui

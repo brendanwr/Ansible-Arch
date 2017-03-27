@@ -1,0 +1,17 @@
+---
+- name: Installing System
+  hosts: all
+  become: yes
+  roles:
+    - { role: install, tags: ['install'] }
+  tags: install
+
+- name: Setting Up System
+  hosts: all
+  become: yes
+  roles:
+    - { role: sys-admin, tags: ['sys-admin'] }
+    - { role: packages, tags: ['packages'] }
+    - { role: gui, tags: ['gui'] }
+  tags: setup
+
